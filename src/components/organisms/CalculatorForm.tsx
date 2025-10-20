@@ -1,5 +1,13 @@
 import React from 'react'
-import { Paper, Typography, Box, Grid, Slider, FormControl, FormLabel } from '@mui/material'
+import {
+  Paper,
+  Typography,
+  Box,
+  Grid,
+  Slider,
+  FormControl,
+  FormLabel,
+} from '@mui/material'
 // InputField は使わなくなったため不要
 import { PrimaryButton } from '../atoms'
 import { LoanFormData } from '../../types'
@@ -31,16 +39,21 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
       <Typography variant="h5" gutterBottom fontWeight="600" textAlign="center">
         ローン計算条件
       </Typography>
-      
+
       <Box sx={{ mt: 3 }}>
         {/* 借入金額：表示は万円単位で入力（内部では円で保存） */}
         <FormControl fullWidth margin="normal">
-          <FormLabel component="legend" sx={{ mb: 1, fontWeight: 600, color: 'white' }}>
+          <FormLabel
+            component="legend"
+            sx={{ mb: 1, fontWeight: 600, color: 'white' }}
+          >
             借入金額（万円）
           </FormLabel>
           <NumberInput
             value={Math.floor(formData.loanAmount / 10000)}
-            onChange={(val) => onFormChange('loanAmount', Math.floor(val * 10000))}
+            onChange={val =>
+              onFormChange('loanAmount', Math.floor(val * 10000))
+            }
             step={10}
             sx={{
               '& .MuiOutlinedInput-root': {
@@ -52,7 +65,10 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
 
         {/* 金利（スライダー + 入力） */}
         <FormControl fullWidth margin="normal">
-          <FormLabel component="legend" sx={{ mb: 1, fontWeight: 600, color: 'white' }}>
+          <FormLabel
+            component="legend"
+            sx={{ mb: 1, fontWeight: 600, color: 'white' }}
+          >
             金利（%）
           </FormLabel>
           <Grid container spacing={2} alignItems="center">
@@ -62,7 +78,9 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
                 min={0}
                 max={10}
                 step={0.1}
-                onChange={(_, v) => onFormChange('interestRate', Array.isArray(v) ? v[0] : v)}
+                onChange={(_, v) =>
+                  onFormChange('interestRate', Array.isArray(v) ? v[0] : v)
+                }
                 aria-labelledby="interest-rate-slider"
                 sx={{ color: 'white' }}
               />
@@ -70,7 +88,7 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
             <Grid item sx={{ width: 120 }}>
               <NumberInput
                 value={formData.interestRate}
-                onChange={(val) => onFormChange('interestRate', val)}
+                onChange={val => onFormChange('interestRate', val)}
                 step={0.1}
                 min={0}
                 max={10}
@@ -86,7 +104,10 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
 
         {/* 借入期間（スライダー + 入力） */}
         <FormControl fullWidth margin="normal">
-          <FormLabel component="legend" sx={{ mb: 1, fontWeight: 600, color: 'white' }}>
+          <FormLabel
+            component="legend"
+            sx={{ mb: 1, fontWeight: 600, color: 'white' }}
+          >
             借入期間（年）
           </FormLabel>
           <Grid container spacing={2} alignItems="center">
@@ -96,7 +117,9 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
                 min={1}
                 max={50}
                 step={1}
-                onChange={(_, v) => onFormChange('loanYears', Array.isArray(v) ? v[0] : v)}
+                onChange={(_, v) =>
+                  onFormChange('loanYears', Array.isArray(v) ? v[0] : v)
+                }
                 aria-labelledby="loan-years-slider"
                 sx={{ color: 'white' }}
               />
@@ -104,7 +127,7 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
             <Grid item sx={{ width: 120 }}>
               <NumberInput
                 value={formData.loanYears}
-                onChange={(val) => onFormChange('loanYears', Math.floor(val))}
+                onChange={val => onFormChange('loanYears', Math.floor(val))}
                 step={1}
                 min={1}
                 max={50}
@@ -117,7 +140,7 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
             </Grid>
           </Grid>
         </FormControl>
-        
+
         <Box sx={{ mt: 3 }}>
           <PrimaryButton
             onClick={onCalculate}
