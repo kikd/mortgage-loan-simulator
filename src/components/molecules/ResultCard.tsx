@@ -1,5 +1,5 @@
 import React from 'react'
-import { Card, CardContent, Typography, Box } from '@mui/material'
+import { Card, CardContent, Typography } from '@mui/material'
 import { formatCurrency } from '../../utils/loanCalculations'
 
 export interface ResultCardProps {
@@ -29,7 +29,12 @@ export const ResultCard: React.FC<ResultCardProps> = ({
         <Typography variant="body2" color="text.secondary" gutterBottom>
           {title}
         </Typography>
-        <Typography variant="h4" component="div" color={`${color}.main`} fontWeight="bold">
+        <Typography
+          variant="h4"
+          component="div"
+          color={`${color}.main`}
+          fontWeight="bold"
+        >
           {formatCurrency(value)}
         </Typography>
       </CardContent>

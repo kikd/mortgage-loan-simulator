@@ -1,9 +1,14 @@
-import React from 'react'
-import { MainTemplate, CalculatorForm, ResultsSection, ChartsGrid } from './components'
+import {
+  MainTemplate,
+  CalculatorForm,
+  ResultsSection,
+  ChartsGrid,
+} from './components'
 import { useLoanCalculator } from './hooks/useLoanCalculator'
 
 function App() {
-  const { formData, calculation, updateFormData, performCalculation } = useLoanCalculator()
+  const { formData, calculation, updateFormData, performCalculation } =
+    useLoanCalculator()
 
   return (
     <MainTemplate>
@@ -12,11 +17,11 @@ function App() {
         onFormChange={updateFormData}
         onCalculate={performCalculation}
       />
-      
+
       {calculation && (
         <>
           <ResultsSection calculation={calculation} />
-          <ChartsGrid calculation={calculation} />
+          <ChartsGrid calculation={calculation} formData={formData} />
         </>
       )}
     </MainTemplate>

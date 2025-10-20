@@ -1,33 +1,64 @@
 import React from 'react'
 import { Grid, Box } from '@mui/material'
 import { ChartWrapper } from '../molecules'
-import { LoanCalculation } from '../../types'
+import { LoanCalculation, LoanFormData } from '../../types'
 import { ApexOptions } from 'apexcharts'
-import { formatCurrency } from '../../utils/loanCalculations'
+import {
+  formatCurrency,
+  calculateLoanEqualPrincipal,
+} from '../../utils/loanCalculations'
 
 export interface ChartsGridProps {
   calculation: LoanCalculation
+  formData: LoanFormData
 }
 
-export const ChartsGrid: React.FC<ChartsGridProps> = ({ calculation }) => {
+export const ChartsGrid: React.FC<ChartsGridProps> = ({
+  calculation,
+  formData,
+}) => {
+  // 元金均等方式の計算結果
+  const equalPrincipalCalculation = calculateLoanEqualPrincipal(formData)
+
   // 年別データの準備（12ヶ月ごと）
   const yearlyData = calculation.paymentSchedule.filter(
     (_, index) => index % 12 === 0
   )
+  const yearlyDataEqualPrincipal =
+    equalPrincipalCalculation.paymentSchedule.filter(
+      (_, index) => index % 12 === 0
+    )
 
-  // 年別返済内訳チャートデータ
+  // 年別返済内訳チャートデータ（元利均等方式）
   const paymentBreakdownData = {
     series: [
       {
-        name: '元本',
+        name: '元本（元利均等）',
         data: yearlyData.map(item => Math.round(item.principal)),
       },
       {
-        name: '利息',
+        name: '利息（元利均等）',
         data: yearlyData.map(item => Math.round(item.interest)),
       },
     ],
     categories: yearlyData.map(
+      item => `${Math.floor((item.month - 1) / 12) + 1}年`
+    ),
+  }
+
+  // 年別返済内訳チャートデータ（元金均等方式）
+  const paymentBreakdownEqualPrincipalData = {
+    series: [
+      {
+        name: '元本（元金均等）',
+        data: yearlyDataEqualPrincipal.map(item => Math.round(item.principal)),
+      },
+      {
+        name: '利息（元金均等）',
+        data: yearlyDataEqualPrincipal.map(item => Math.round(item.interest)),
+      },
+    ],
+    categories: yearlyDataEqualPrincipal.map(
       item => `${Math.floor((item.month - 1) / 12) + 1}年`
     ),
   }
@@ -111,8 +142,12 @@ export const ChartsGrid: React.FC<ChartsGridProps> = ({ calculation }) => {
   const balanceData = {
     series: [
       {
-        name: '残高',
+        name: '残高（元利均等）',
         data: yearlyData.map(item => Math.round(item.balance)),
+      },
+      {
+        name: '残高（元金均等）',
+        data: yearlyDataEqualPrincipal.map(item => Math.round(item.balance)),
       },
     ],
     categories: paymentBreakdownData.categories,
@@ -213,12 +248,75 @@ export const ChartsGrid: React.FC<ChartsGridProps> = ({ calculation }) => {
     },
   }
 
+  // 累積利息チャートデータ
+  const cumulativeInterestData = {
+    series: [
+      {
+        name: '累積利息（元利均等）',
+        data: yearlyData.map(item => Math.round(item.cumulativeInterest || 0)),
+      },
+      {
+        name: '累積利息（元金均等）',
+        data: yearlyDataEqualPrincipal.map(item =>
+          Math.round(item.cumulativeInterest || 0)
+        ),
+      },
+    ],
+    categories: paymentBreakdownData.categories,
+  }
+
+  const cumulativeInterestOptions: ApexOptions = {
+    chart: {
+      type: 'line',
+      toolbar: {
+        show: true,
+      },
+      zoom: {
+        enabled: true,
+        type: 'x',
+        autoScaleYaxis: true,
+      },
+    },
+    xaxis: {
+      categories: cumulativeInterestData.categories,
+      title: { text: '年' },
+      type: 'category',
+    },
+    yaxis: {
+      title: { text: '累積利息（円）' },
+      labels: {
+        formatter: (value: number) => formatCurrency(value),
+      },
+    },
+    tooltip: {
+      shared: true,
+      intersect: false,
+      y: {
+        formatter: (value: number) => formatCurrency(value),
+      },
+    },
+    colors: ['#1976d2', '#ff9800'],
+    stroke: {
+      curve: 'smooth',
+      width: 3,
+    },
+    markers: {
+      size: 4,
+    },
+    legend: {
+      position: 'top',
+    },
+    grid: {
+      borderColor: '#e0e0e0',
+    },
+  }
+
   return (
     <Box sx={{ mt: 4 }}>
       <Grid container spacing={4}>
         <Grid item xs={12} lg={6}>
           <ChartWrapper
-            title="年別返済内訳（元本・利息）"
+            title="年別返済内訳（元利均等）"
             chartOptions={paymentBreakdownOptions}
             series={paymentBreakdownData.series}
             type="bar"
@@ -227,9 +325,40 @@ export const ChartsGrid: React.FC<ChartsGridProps> = ({ calculation }) => {
 
         <Grid item xs={12} lg={6}>
           <ChartWrapper
-            title="ローン残高推移"
-            chartOptions={balanceOptions}
+            title="年別返済内訳（元金均等）"
+            chartOptions={{
+              ...paymentBreakdownOptions,
+              colors: ['#4caf50', '#ffc107'],
+            }}
+            series={paymentBreakdownEqualPrincipalData.series}
+            type="bar"
+          />
+        </Grid>
+
+        <Grid item xs={12} lg={6}>
+          <ChartWrapper
+            title="ローン残高推移（比較）"
+            chartOptions={{
+              ...balanceOptions,
+              colors: ['#1976d2', '#ff9800'],
+              tooltip: {
+                shared: true,
+                intersect: false,
+                y: {
+                  formatter: (value: number) => formatCurrency(value),
+                },
+              },
+            }}
             series={balanceData.series}
+            type="line"
+          />
+        </Grid>
+
+        <Grid item xs={12} lg={6}>
+          <ChartWrapper
+            title="累積利息推移（比較）"
+            chartOptions={cumulativeInterestOptions}
+            series={cumulativeInterestData.series}
             type="line"
           />
         </Grid>

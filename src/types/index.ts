@@ -14,6 +14,7 @@ export interface PaymentScheduleItem {
   principal: number
   interest: number
   balance: number
+  cumulativeInterest?: number
 }
 
 export interface LoanFormData {
