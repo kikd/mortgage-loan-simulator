@@ -1,0 +1,1 @@
+export { MainTemplate, type MainTemplateProps } from './MainTemplate'
