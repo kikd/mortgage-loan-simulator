@@ -4,7 +4,8 @@ import { formatCurrency } from '../../utils/loanCalculations'
 
 export interface ResultCardProps {
   title: string
-  value: number
+  // allow either a numeric value or a preformatted string (e.g. range)
+  value: number | string
   color?: 'primary' | 'secondary' | 'success' | 'error' | 'warning' | 'info'
 }
 
@@ -35,7 +36,7 @@ export const ResultCard: React.FC<ResultCardProps> = ({
           color={`${color}.main`}
           fontWeight="bold"
         >
-          {formatCurrency(value)}
+          {typeof value === 'number' ? formatCurrency(value) : value}
         </Typography>
       </CardContent>
     </Card>

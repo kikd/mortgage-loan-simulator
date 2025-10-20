@@ -6,39 +6,47 @@ export const calculateLoan = (formData: LoanFormData): LoanCalculation => {
   const totalMonths = loanYears * 12
 
   // 月々の返済額計算
-  const monthlyPayment =
+  const rawMonthlyPayment =
     (loanAmount * monthlyRate * Math.pow(1 + monthlyRate, totalMonths)) /
     (Math.pow(1 + monthlyRate, totalMonths) - 1)
+  // 小数点以下を切り下げ
+  const monthlyPaymentFloored = Math.floor(rawMonthlyPayment)
 
   // 返済スケジュール計算
   const paymentSchedule = []
   let remainingBalance = loanAmount
   let cumulativeInterest = 0
+  let totalPayment = 0
 
   for (let month = 1; month <= totalMonths; month++) {
-    const interestPayment = remainingBalance * monthlyRate
-    const principalPayment = monthlyPayment - interestPayment
+    const interestPaymentRaw = remainingBalance * monthlyRate
+    const interestPayment = Math.floor(interestPaymentRaw)
+
+    const principalPaymentRaw = rawMonthlyPayment - interestPaymentRaw
+    const principalPayment = Math.floor(principalPaymentRaw)
+
+    const monthlyPayment = interestPayment + principalPayment
     remainingBalance -= principalPayment
     cumulativeInterest += interestPayment
+    totalPayment += monthlyPayment
 
     paymentSchedule.push({
       month,
       payment: monthlyPayment,
       principal: principalPayment,
       interest: interestPayment,
-      balance: Math.max(0, remainingBalance),
+      balance: Math.max(0, Math.floor(remainingBalance)),
       cumulativeInterest,
     })
   }
 
-  const totalPayment = monthlyPayment * totalMonths
   const totalInterest = totalPayment - loanAmount
 
   return {
     principal: loanAmount,
     interestRate,
     years: loanYears,
-    monthlyPayment,
+    monthlyPayment: monthlyPaymentFloored,
     totalPayment,
     totalInterest,
     paymentSchedule,
@@ -53,7 +61,8 @@ export const calculateLoanEqualPrincipal = (
   const totalMonths = loanYears * 12
 
   // 月々の元本返済額（一定）
-  const monthlyPrincipal = loanAmount / totalMonths
+  const monthlyPrincipalRaw = loanAmount / totalMonths
+  const monthlyPrincipal = Math.floor(monthlyPrincipalRaw)
 
   // 返済スケジュール計算
   const paymentSchedule = []
@@ -62,7 +71,9 @@ export const calculateLoanEqualPrincipal = (
   let cumulativeInterest = 0
 
   for (let month = 1; month <= totalMonths; month++) {
-    const interestPayment = remainingBalance * monthlyRate
+    const interestPaymentRaw = remainingBalance * monthlyRate
+    const interestPayment = Math.floor(interestPaymentRaw)
+
     const principalPayment = monthlyPrincipal
     const monthlyPayment = principalPayment + interestPayment
     remainingBalance -= principalPayment
@@ -74,7 +85,7 @@ export const calculateLoanEqualPrincipal = (
       payment: monthlyPayment,
       principal: principalPayment,
       interest: interestPayment,
-      balance: Math.max(0, remainingBalance),
+      balance: Math.max(0, Math.floor(remainingBalance)),
       cumulativeInterest,
     })
   }
@@ -93,5 +104,5 @@ export const calculateLoanEqualPrincipal = (
 }
 
 export const formatCurrency = (amount: number): string => {
-  return `¥${Math.round(amount).toLocaleString()}`
+  return `¥${Math.floor(amount).toLocaleString()}`
 }

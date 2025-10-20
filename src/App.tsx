@@ -20,7 +20,7 @@ function App() {
 
       {calculation && (
         <>
-          <ResultsSection calculation={calculation} />
+          <ResultsSection calculation={calculation} formData={formData} />
           <ChartsGrid calculation={calculation} formData={formData} />
         </>
       )}
