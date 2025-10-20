@@ -1,8 +1,9 @@
 import React from 'react'
-import { Paper, Typography, Box } from '@mui/material'
-import { InputField } from '../molecules'
+import { Paper, Typography, Box, Grid, Slider, FormControl, FormLabel } from '@mui/material'
+// InputField は使わなくなったため不要
 import { PrimaryButton } from '../atoms'
 import { LoanFormData } from '../../types'
+import { NumberInput } from '../atoms/NumberInput'
 
 export interface CalculatorFormProps {
   formData: LoanFormData
@@ -32,44 +33,90 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
       </Typography>
       
       <Box sx={{ mt: 3 }}>
-        <InputField
-          label="借入金額（円）"
-          value={formData.loanAmount}
-          onChange={(value) => onFormChange('loanAmount', value)}
-          step={1000000}
-          sx={{
-            '& .MuiOutlinedInput-root': {
-              backgroundColor: 'rgba(255, 255, 255, 0.9)',
-            },
-          }}
-        />
-        
-        <InputField
-          label="金利（%）"
-          value={formData.interestRate}
-          onChange={(value) => onFormChange('interestRate', value)}
-          step={0.1}
-          min={0}
-          max={10}
-          sx={{
-            '& .MuiOutlinedInput-root': {
-              backgroundColor: 'rgba(255, 255, 255, 0.9)',
-            },
-          }}
-        />
-        
-        <InputField
-          label="借入期間（年）"
-          value={formData.loanYears}
-          onChange={(value) => onFormChange('loanYears', value)}
-          min={1}
-          max={50}
-          sx={{
-            '& .MuiOutlinedInput-root': {
-              backgroundColor: 'rgba(255, 255, 255, 0.9)',
-            },
-          }}
-        />
+        {/* 借入金額：表示は万円単位で入力（内部では円で保存） */}
+        <FormControl fullWidth margin="normal">
+          <FormLabel component="legend" sx={{ mb: 1, fontWeight: 600, color: 'white' }}>
+            借入金額（万円）
+          </FormLabel>
+          <NumberInput
+            value={Math.floor(formData.loanAmount / 10000)}
+            onChange={(val) => onFormChange('loanAmount', Math.floor(val * 10000))}
+            step={10}
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                backgroundColor: 'rgba(255, 255, 255, 0.9)',
+              },
+            }}
+          />
+        </FormControl>
+
+        {/* 金利（スライダー + 入力） */}
+        <FormControl fullWidth margin="normal">
+          <FormLabel component="legend" sx={{ mb: 1, fontWeight: 600, color: 'white' }}>
+            金利（%）
+          </FormLabel>
+          <Grid container spacing={2} alignItems="center">
+            <Grid item xs>
+              <Slider
+                value={formData.interestRate}
+                min={0}
+                max={10}
+                step={0.1}
+                onChange={(_, v) => onFormChange('interestRate', Array.isArray(v) ? v[0] : v)}
+                aria-labelledby="interest-rate-slider"
+                sx={{ color: 'white' }}
+              />
+            </Grid>
+            <Grid item sx={{ width: 120 }}>
+              <NumberInput
+                value={formData.interestRate}
+                onChange={(val) => onFormChange('interestRate', val)}
+                step={0.1}
+                min={0}
+                max={10}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                  },
+                }}
+              />
+            </Grid>
+          </Grid>
+        </FormControl>
+
+        {/* 借入期間（スライダー + 入力） */}
+        <FormControl fullWidth margin="normal">
+          <FormLabel component="legend" sx={{ mb: 1, fontWeight: 600, color: 'white' }}>
+            借入期間（年）
+          </FormLabel>
+          <Grid container spacing={2} alignItems="center">
+            <Grid item xs>
+              <Slider
+                value={formData.loanYears}
+                min={1}
+                max={50}
+                step={1}
+                onChange={(_, v) => onFormChange('loanYears', Array.isArray(v) ? v[0] : v)}
+                aria-labelledby="loan-years-slider"
+                sx={{ color: 'white' }}
+              />
+            </Grid>
+            <Grid item sx={{ width: 120 }}>
+              <NumberInput
+                value={formData.loanYears}
+                onChange={(val) => onFormChange('loanYears', Math.floor(val))}
+                step={1}
+                min={1}
+                max={50}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                  },
+                }}
+              />
+            </Grid>
+          </Grid>
+        </FormControl>
         
         <Box sx={{ mt: 3 }}>
           <PrimaryButton

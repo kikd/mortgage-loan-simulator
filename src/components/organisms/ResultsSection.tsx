@@ -2,7 +2,10 @@ import React from 'react'
 import { Grid, Typography, Box } from '@mui/material'
 import { ResultCard } from '../molecules'
 import { LoanCalculation, LoanFormData } from '../../types'
-import { calculateLoanEqualPrincipal } from '../../utils/loanCalculations'
+import {
+  calculateLoanEqualPrincipal,
+  formatCurrency,
+} from '../../utils/loanCalculations'
 
 export interface ResultsSectionProps {
   calculation: LoanCalculation
@@ -67,11 +70,14 @@ export const ResultsSection: React.FC<ResultsSectionProps> = ({
           </Typography>
           <Grid container spacing={2}>
             <Grid item xs={12} sm={4}>
-              <ResultCard
-                title="月々の返済額（初回）"
-                value={equalPrincipal.monthlyPayment}
-                color="primary"
-              />
+              {equalPrincipal.paymentSchedule &&
+                equalPrincipal.paymentSchedule.length > 0 && (
+                  <ResultCard
+                    title="月々の返済額（初回〜最終回）"
+                    value={`${formatCurrency(equalPrincipal.paymentSchedule[0].payment)} 〜 ${formatCurrency(equalPrincipal.paymentSchedule[equalPrincipal.paymentSchedule.length - 1].payment)}`}
+                    color="primary"
+                  />
+                )}
             </Grid>
             <Grid item xs={12} sm={4}>
               <ResultCard
