@@ -1,0 +1,10 @@
+{
+  // Cloudflare Workers/Wrangler config for static assets deployment
+  "name": "mortgage-loan-simulator",
+  // Set compatibility_date to today's date (ISO) to satisfy Wrangler
+  "compatibility_date": "2025-10-22",
+  // Declare dist as the directory of static assets to upload
+  "assets": {
+    "directory": "./dist",
+  },
+}
