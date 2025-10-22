@@ -1,17 +1,15 @@
 import React from 'react'
 import { Paper, Typography } from '@mui/material'
 import Chart from 'react-apexcharts'
-import {
-  ApexOptions,
-  ApexAxisChartSeries,
-  ApexNonAxisChartSeries,
-} from 'apexcharts'
+import { ApexOptions } from 'apexcharts'
+
+type ReactApexProps = React.ComponentProps<typeof Chart>
 
 export interface ChartWrapperProps {
   title: string
   chartOptions: ApexOptions
-  series: ApexAxisChartSeries | ApexNonAxisChartSeries
-  type: 'line' | 'bar' | 'area' | 'pie' | string
+  series: ReactApexProps['series']
+  type: ReactApexProps['type']
   height?: number
 }
 
