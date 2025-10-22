@@ -1,5 +1,12 @@
 import React from 'react'
-import { Container, Typography, Box, ThemeProvider, createTheme, CssBaseline } from '@mui/material'
+import {
+  Container,
+  Typography,
+  Box,
+  ThemeProvider,
+  createTheme,
+  CssBaseline,
+} from '@mui/material'
 
 const theme = createTheme({
   palette: {
@@ -69,7 +76,7 @@ export const MainTemplate: React.FC<MainTemplateProps> = ({ children }) => {
           >
             住宅ローンシミュレーター
           </Typography>
-          
+
           {children}
         </Container>
       </Box>

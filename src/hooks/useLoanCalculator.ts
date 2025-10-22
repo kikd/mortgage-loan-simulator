@@ -8,7 +8,7 @@ export const useLoanCalculator = () => {
     interestRate: 1.5,
     loanYears: 35,
   })
-  
+
   const [calculation, setCalculation] = useState<LoanCalculation | null>(null)
 
   const updateFormData = (field: keyof LoanFormData, value: number) => {
